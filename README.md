@@ -1,3 +1,9 @@
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
+![HTML5](https://img.shields.io/badge/HTML-5-red)
+![CSS3](https://img.shields.io/badge/CSS-3-blue)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
+![Groq](https://img.shields.io/badge/Groq-LLM-purple)
 **DocuMind AI - Chat with Your Documents**
 
 **Overview**
