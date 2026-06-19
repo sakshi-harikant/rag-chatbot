@@ -47,5 +47,4 @@ DocuMind AI is an intelligent document Q&A platform that allows users to upload 
 4. `mvn spring-boot:run`
 5. Open: `http://localhost:8080`
 
-**License**
-MIT License
+
