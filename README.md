@@ -4,6 +4,8 @@
 ![CSS3](https://img.shields.io/badge/CSS-3-blue)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
 ![Groq](https://img.shields.io/badge/Groq-LLM-purple)
+
+
 **DocuMind AI - Chat with Your Documents**
 
 **Overview**
