@@ -53,8 +53,8 @@ DocuMind AI is an intelligent document Q&A platform that allows users to upload 
 **Home Page**
 ![Home Page](screenshots/Screenshot%202026-06-19%20133034.png)
 
-**Chat Interface**
 ![Chat Interface](screenshots/Screenshot%202026-06-19%20133203.png)
 
-**Upload Document**
+
+**Chat Interface**
 ![Upload](screenshots/Screenshot%202026-06-19%20133306.png)
