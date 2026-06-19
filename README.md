@@ -46,5 +46,15 @@ DocuMind AI is an intelligent document Q&A platform that allows users to upload 
 3. `mvn clean install`
 4. `mvn spring-boot:run`
 5. Open: `http://localhost:8080`
+   
 
+**Screenshots**
 
+**Home Page**
+![Home Page](screenshots/Screenshot%202026-06-19%20133034.png)
+
+**Chat Interface**
+![Chat Interface](screenshots/Screenshot%202026-06-19%20133203.png)
+
+**Upload Document**
+![Upload](screenshots/Screenshot%202026-06-19%20133306.png)
