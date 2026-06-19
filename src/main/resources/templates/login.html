@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocuMind AI - Chat with your documents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* ----- ANIMATED BACKGROUND ----- */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: floatOrb 25s ease-in-out infinite alternate;
+        }
+        .bg-animation .orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: #667eea;
+            top: -15%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        .bg-animation .orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: #764ba2;
+            bottom: -15%;
+            right: -10%;
+            animation-delay: -8s;
+        }
+        .bg-animation .orb:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: #f093fb;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -16s;
+        }
+        .bg-animation .orb:nth-child(4) {
+            width: 300px;
+            height: 300px;
+            background: #4facfe;
+            top: 60%;
+            left: 20%;
+            animation-delay: -5s;
+        }
+        @keyframes floatOrb {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(60px, -40px) scale(1.15);
+            }
+            66% {
+                transform: translate(-40px, 60px) scale(0.85);
+            }
+            100% {
+                transform: translate(30px, -30px) scale(1.05);
+            }
+        }
+
+        /* ----- PARTICLES ----- */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            animation: floatParticle 20s infinite linear;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ----- CONTAINER ----- */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ----- NAVBAR ----- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+        /* Professional Bot Icon - LARGER in navbar */
+        .logo .bot-icon {
+            width: 72px;
+            height: 72px;
+            animation: floatBot 3s ease-in-out infinite;
+            filter: drop-shadow(0 4px 20px rgba(102, 126, 234, 0.3));
+        }
+        @keyframes floatBot {
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-6px) rotate(-2deg);
+            }
+        }
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .logo-text .highlight {
+            color: #667eea;
+            -webkit-text-fill-color: #667eea;
+        }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #a0a0b0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-login-btn {
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50px;
+            color: #fff !important;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            color: #fff !important;
+        }
+        .nav-login-btn::after {
+            display: none !important;
+        }
+
+        /* ----- HERO ----- */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 30px 0 50px;
+        }
+        .hero-content h1 {
+            font-size: 58px;
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 20%, #667eea 60%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1.5px;
+        }
+        .hero-content .tagline {
+            font-size: 24px;
+            font-weight: 600;
+            color: #a0a0b0;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+        .hero-content .tagline .highlight {
+            color: #667eea;
+            -webkit-text-fill-color: #667eea;
+        }
+        .hero-content .description {
+            font-size: 17px;
+            color: #8888a0;
+            line-height: 1.8;
+            max-width: 500px;
+            margin-bottom: 32px;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+        .hero-stats .stat .number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            display: block;
+        }
+        .hero-stats .stat .label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            padding: 16px 44px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 30px rgba(102, 126, 234, 0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 50px rgba(102, 126, 234, 0.5);
+        }
+        .btn-primary .arrow {
+            transition: transform 0.3s;
+        }
+        .btn-primary:hover .arrow {
+            transform: translateX(6px);
+        }
+        .btn-secondary {
+            padding: 16px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-4px);
+        }
+
+        /* ----- ILLUSTRATION / DEMO BOX ----- */
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .hero-visual .illustration {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .illustration .glow-ring {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(20px);
+        }
+        /* Bot icon in hero - smaller/medium size */
+        .illustration .hero-bot-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            display: block;
+            animation: pulseIcon 3s ease-in-out infinite;
+            filter: drop-shadow(0 4px 30px rgba(102, 126, 234, 0.3));
+        }
+        @keyframes pulseIcon {
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.05) rotate(-2deg);
+            }
+        }
+        .illustration .demo-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 12px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .demo-box .demo-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .demo-box .demo-row:last-child {
+            margin-bottom: 0;
+        }
+        .demo-box .demo-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            min-width: 28px;
+            padding-top: 4px;
+        }
+        .demo-box .user-msg {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 10px 18px;
+            border-radius: 14px;
+            border-bottom-right-radius: 4px;
+            font-size: 14px;
+            color: #fff;
+            margin-left: auto;
+            max-width: 80%;
+        }
+        .demo-box .bot-msg {
+            background: rgba(255, 255, 255, 0.07);
+            padding: 10px 18px;
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            font-size: 14px;
+            color: #ccc;
+            max-width: 80%;
+        }
+        .demo-box .bot-msg .highlight {
+            color: #667eea;
+            font-weight: 600;
+        }
+        .demo-box .typing-dots {
+            display: inline-flex;
+            gap: 4px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+        }
+        .demo-box .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite;
+        }
+        .demo-box .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .demo-box .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typingDot {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+        .demo-box .source-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .demo-box .source-tags span {
+            font-size: 11px;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* ----- SCROLL INDICATOR ----- */
+        .scroll-indicator {
+            text-align: center;
+            padding: 30px 0 10px;
+            animation: bounceDown 2.5s ease-in-out infinite;
+        }
+        .scroll-indicator a {
+            color: #555;
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s;
+        }
+        .scroll-indicator a:hover {
+            color: #667eea;
+        }
+        .scroll-indicator .arrow {
+            font-size: 28px;
+            display: block;
+            line-height: 1;
+        }
+        .scroll-indicator .line {
+            width: 1px;
+            height: 30px;
+            background: linear-gradient(to bottom, #667eea, transparent);
+            margin-top: 4px;
+        }
+        @keyframes bounceDown {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(10px);
+            }
+        }
+
+        /* ----- HOW IT WORKS ----- */
+        .how-it-works {
+            padding: 70px 0 40px;
+            text-align: center;
+        }
+        .how-it-works .section-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .how-it-works h2 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .how-it-works .subtitle {
+            color: #8888a0;
+            font-size: 17px;
+            max-width: 600px;
+            margin: 0 auto 50px;
+            line-height: 1.6;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+        }
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 36px 24px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .step-card:hover::before {
+            opacity: 1;
+        }
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(102, 126, 234, 0.2);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .step-number {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s;
+        }
+        .step-card:hover .step-number {
+            transform: scale(1.05);
+        }
+        .step-card .step-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            display: block;
+        }
+        .step-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+        .step-card p {
+            font-size: 14px;
+            color: #8888a0;
+            line-height: 1.7;
+        }
+
+        /* ----- FEATURES ----- */
+        .features-section {
+            padding: 50px 0 30px;
+            text-align: center;
+        }
+        .features-section .section-badge {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.12);
+            color: #667eea;
+            padding: 4px 18px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+        .features-section h2 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .features-section .subtitle {
+            color: #8888a0;
+            font-size: 15px;
+            max-width: 550px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            padding: 30px 24px 26px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .feature-item:hover::before {
+            opacity: 1;
+        }
+        .feature-item:hover {
+            transform: translateY(-6px);
+            border-color: rgba(102, 126, 234, 0.15);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.06);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .feature-item .icon-box {
+            width: 56px;
+            height: 56px;
+            background: rgba(102, 126, 234, 0.12);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            transition: all 0.3s;
+        }
+        .feature-item .icon-box svg {
+            width: 28px;
+            height: 28px;
+            stroke: #667eea;
+            stroke-width: 1.8;
+            fill: none;
+        }
+        .feature-item:hover .icon-box {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.05);
+        }
+        .feature-item .title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #e0e0e0;
+            margin-bottom: 6px;
+        }
+        .feature-item .desc {
+            font-size: 14px;
+            color: #8888a0;
+            line-height: 1.6;
+            max-width: 260px;
+            margin: 0 auto;
+        }
+        .feature-item .tag {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 14px;
+            background: rgba(102, 126, 234, 0.08);
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* ----- FOOTER ----- */
+        .footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 0 24px;
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer .footer-brand .bot-icon-small {
+            width: 32px;
+            height: 32px;
+            animation: floatBot 3s ease-in-out infinite;
+            filter: drop-shadow(0 2px 10px rgba(102, 126, 234, 0.2));
+        }
+        .footer .footer-brand .brand-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8888a0;
+        }
+        .footer .footer-brand .brand-text span {
+            color: #667eea;
+        }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: #667eea;
+        }
+        .footer .copyright {
+            color: #444;
+            font-size: 13px;
+            width: 100%;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+                padding: 20px 0 30px;
+            }
+            .hero-content .description {
+                margin: 0 auto 32px;
+            }
+            .hero-stats {
+                justify-content: center;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 36px;
+            }
+            .hero-content .tagline {
+                font-size: 18px;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: center;
+            }
+            .logo .bot-icon {
+                width: 60px;
+                height: 60px;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                max-width: 420px;
+                margin: 0 auto;
+            }
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+            .btn-primary,
+            .btn-secondary {
+                padding: 14px 32px;
+                font-size: 14px;
+            }
+            .how-it-works h2 {
+                font-size: 30px;
+            }
+            .features-section h2 {
+                font-size: 28px;
+            }
+            .hero-stats {
+                gap: 24px;
+                flex-wrap: wrap;
+            }
+            .hero-stats .stat .number {
+                font-size: 22px;
+            }
+        }
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 28px;
+            }
+            .container {
+                padding: 20px 16px;
+            }
+            .logo .bot-icon {
+                width: 50px;
+                height: 50px;
+            }
+            .illustration {
+                padding: 20px 16px;
+            }
+            .illustration .hero-bot-icon {
+                width: 56px;
+                height: 56px;
+            }
+            .demo-box .user-msg,
+            .demo-box .bot-msg {
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-animation">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <!-- Professional Bot Icon - LARGER in navbar -->
+            <svg class="bot-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Head -->
+                <rect x="15" y="20" width="70" height="50" rx="20" stroke="#667eea" stroke-width="2.5" fill="none" />
+                <!-- Antenna -->
+                <line x1="50" y1="20" x2="50" y2="8" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="50" cy="6" r="4" fill="#667eea" />
+                <!-- Eyes -->
+                <ellipse cx="35" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <ellipse cx="65" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <circle cx="35" cy="38" r="3" fill="#667eea" />
+                <circle cx="65" cy="38" r="3" fill="#667eea" />
+                <!-- Smile -->
+                <path d="M35 52 Q50 62 65 52" stroke="#667eea" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                <!-- Ears -->
+                <rect x="5" y="30" width="12" height="14" rx="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <rect x="83" y="30" width="12" height="14" rx="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <!-- Body -->
+                <rect x="25" y="72" width="50" height="20" rx="8" stroke="#667eea" stroke-width="2.5" fill="none" />
+                <!-- Arms -->
+                <line x1="15" y1="75" x2="5" y2="85" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="85" y1="75" x2="95" y2="85" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                <!-- Heart on body -->
+                <path d="M45 80 Q47 76 50 80 Q53 76 55 80 Q57 86 50 90 Q43 86 45 80Z" fill="#667eea" opacity="0.6" />
+            </svg>
+            <span class="logo-text">Docu<span class="highlight">Mind</span> AI</span>
+        </a>
+        <div class="nav-links">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#features">Features</a>
+            <a href="/oauth2/authorization/google?prompt=select_account" class="nav-login-btn">Login</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1>Chat with your documents using AI</h1>
+            <p class="tagline">DocuMind AI — <span class="highlight">Intelligent Document Q&amp;A</span></p>
+            <p class="description">
+                Upload your files and ask questions in natural language. Our AI retrieves
+                relevant information from your documents and provides accurate answers with sources.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="number">PDF, DOCX, TXT</span>
+                    <span class="label">Supported Formats</span>
+                </div>
+                <div class="stat">
+                    <span class="number">100%</span>
+                    <span class="label">Private &amp; Secure</span>
+                </div>
+                <div class="stat">
+                    <span class="number">AI-Powered</span>
+                    <span class="label">Instant Answers</span>
+                </div>
+            </div>
+            <div class="hero-buttons">
+                <a href="/oauth2/authorization/google?prompt=select_account" class="btn-primary">
+                    Get Started Free
+                    <span class="arrow">→</span>
+                </a>
+                <a href="#how-it-works" class="btn-secondary">
+                    Learn More ↓
+                </a>
+            </div>
+        </div>
+
+        <!-- ILLUSTRATION -->
+        <div class="hero-visual">
+            <div class="illustration">
+                <div class="glow-ring"></div>
+
+                <!-- Professional Bot Icon in Hero - standard size -->
+                <svg class="hero-bot-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="15" y="20" width="70" height="50" rx="20" stroke="#667eea" stroke-width="2.5" fill="none" />
+                    <line x1="50" y1="20" x2="50" y2="8" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="50" cy="6" r="4" fill="#667eea" />
+                    <ellipse cx="35" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                    <ellipse cx="65" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                    <circle cx="35" cy="38" r="3" fill="#667eea" />
+                    <circle cx="65" cy="38" r="3" fill="#667eea" />
+                    <path d="M35 52 Q50 62 65 52" stroke="#667eea" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                    <rect x="5" y="30" width="12" height="14" rx="6" stroke="#667eea" stroke-width="2" fill="none" />
+                    <rect x="83" y="30" width="12" height="14" rx="6" stroke="#667eea" stroke-width="2" fill="none" />
+                    <rect x="25" y="72" width="50" height="20" rx="8" stroke="#667eea" stroke-width="2.5" fill="none" />
+                    <line x1="15" y1="75" x2="5" y2="85" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="85" y1="75" x2="95" y2="85" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                    <path d="M45 80 Q47 76 50 80 Q53 76 55 80 Q57 86 50 90 Q43 86 45 80Z" fill="#667eea" opacity="0.6" />
+                </svg>
+
+                <div class="demo-box">
+                    <div class="demo-row">
+                        <span class="demo-label">You</span>
+                        <span class="user-msg">What is the vacation policy?</span>
+                    </div>
+                    <div class="demo-row">
+                        <span class="demo-label">AI</span>
+                        <span class="bot-msg">According to <span class="highlight">policy.pdf</span>, employees get 20 days of paid vacation per year.</span>
+                    </div>
+                    <div class="demo-row">
+                        <span class="demo-label">AI</span>
+                        <div class="typing-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <div class="source-tags">
+                        <span>📄 policy.pdf</span>
+                        <span>📄 guidelines.txt</span>
+                        <span>📄 benefits.pdf</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCROLL INDICATOR -->
+    <div class="scroll-indicator">
+        <a href="#how-it-works">
+            <span class="arrow">↓</span>
+            <span>Discover how it works</span>
+            <div class="line"></div>
+        </a>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-it-works" id="how-it-works">
+        <span class="section-badge">⚡ Get Started in 4 Steps</span>
+        <h2>How to Use DocuMind AI</h2>
+        <p class="subtitle">Upload documents, ask questions, and get AI-powered answers instantly.</p>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <svg class="step-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#667eea" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+                <h3>Create an Account</h3>
+                <p>Sign up and log in securely with Google OAuth. No passwords to remember.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <svg class="step-icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M8 8h8M8 12h6M8 16h4" stroke="#667eea" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <h3>Upload Documents</h3>
+                <p>Upload PDFs, DOCX, TXT, HTML, or even images with text. Your data stays private.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <svg class="step-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M8 8h8M8 12h6" stroke="#667eea" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <h3>Ask Questions</h3>
+                <p>Ask anything about your documents in natural language. No complex queries needed.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <svg class="step-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#667eea" stroke-width="1.8" fill="none"/><polyline points="12 6 12 12 16 14" stroke="#667eea" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+                <h3>Get AI Answers</h3>
+                <p>Instant answers with source citations. Know exactly where the information came from.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features-section" id="features">
+        <span class="section-badge">💎 Powerful Features</span>
+        <h2>Why Choose DocuMind AI</h2>
+        <p class="subtitle">Everything you need to chat with your documents using AI.</p>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#667eea" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div>
+                <div class="title">Privacy First</div>
+                <div class="desc">Your documents are never shared. Only you can access them. End-to-end encrypted.</div>
+                <span class="tag">Secure</span>
+            </div>
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#667eea" stroke-width="1.8" fill="none"/><polyline points="12 6 12 12 16 14" stroke="#667eea" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div>
+                <div class="title">Fast &amp; Accurate</div>
+                <div class="desc">Powered by Groq's ultra-fast LLM for real-time responses with high accuracy.</div>
+                <span class="tag">Real-time</span>
+            </div>
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M8 8h8M8 12h6M8 16h4" stroke="#667eea" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">Multiple Formats</div>
+                <div class="desc">Support for PDF, DOCX, TXT, HTML, PNG, JPG and more. Upload anything.</div>
+                <span class="tag">Versatile</span>
+            </div>
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="#667eea" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M8 7h8M8 11h6M8 15h4" stroke="#667eea" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">Source Citations</div>
+                <div class="desc">Every answer includes references to the source document for full transparency.</div>
+                <span class="tag">Transparent</span>
+            </div>
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M8 8h8M8 12h6" stroke="#667eea" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <div class="title">Chat History</div>
+                <div class="desc">All conversations are saved. Pick up exactly where you left off anytime.</div>
+                <span class="tag">Persistent</span>
+            </div>
+            <div class="feature-item">
+                <div class="icon-box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#667eea" stroke-width="1.8" fill="none"/><path d="M3 12h18M9 3a15 15 0 000 18M15 3a15 15 0 010 18" stroke="#667eea" stroke-width="1.8" fill="none"/></svg></div>
+                <div class="title">Works Anywhere</div>
+                <div class="desc">Fully responsive design. Use it on desktop, tablet, or mobile devices.</div>
+                <span class="tag">Responsive</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-brand">
+            <svg class="bot-icon-small" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="15" y="20" width="70" height="50" rx="20" stroke="#667eea" stroke-width="2.5" fill="none" />
+                <line x1="50" y1="20" x2="50" y2="8" stroke="#667eea" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="50" cy="6" r="4" fill="#667eea" />
+                <ellipse cx="35" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <ellipse cx="65" cy="38" rx="8" ry="6" stroke="#667eea" stroke-width="2" fill="none" />
+                <circle cx="35" cy="38" r="3" fill="#667eea" />
+                <circle cx="65" cy="38" r="3" fill="#667eea" />
+                <path d="M35 52 Q50 62 65 52" stroke="#667eea" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            </svg>
+            <span class="brand-text">Powered by <span>AI</span></span>
+        </div>
+        <div class="footer-links">
+            <a href="#how-it-works">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="#">Terms</a>
+        </div>
+        <div class="copyright">
+            &copy; 2026 DocuMind AI. Built with ❤️ using Spring Boot &amp; Groq AI.
+        </div>
+    </footer>
+
+</div>
+
+<script>
+    (function() {
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 60; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.width = (Math.random() * 4 + 1) + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = (Math.random() * 25 + 15) + 's';
+            p.style.animationDelay = (Math.random() * 25) + 's';
+            p.style.opacity = Math.random() * 0.6 + 0.2;
+            container.appendChild(p);
+        }
+    })();
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.step-card, .feature-item').forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = `all 0.6s ease ${index * 0.08}s`;
+        observer.observe(el);
+    });
+</script>
+
+</body>
+</html>
