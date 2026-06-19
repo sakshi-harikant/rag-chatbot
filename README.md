@@ -1,9 +1,9 @@
-DocuMind AI - Chat with Your Documents
+**DocuMind AI - Chat with Your Documents**
 
-Overview
+**Overview**
 DocuMind AI is an intelligent document Q&A platform that allows users to upload documents and ask questions in natural language. Powered by Groq's ultra-fast LLM, it provides instant answers with source citations.
 
-Key Highlights
+**Key Highlights**
 - AI-powered document understanding
 - Real-time responses with Groq LLM
 - Secure Google OAuth authentication
@@ -11,7 +11,7 @@ Key Highlights
 - Clean, modern dark theme UI
 - Fully responsive design
 
-Features
+**Features**
 - Google OAuth login
 - Upload PDF, DOCX, TXT, HTML, PNG, JPG
 - Ask questions in natural language
@@ -19,35 +19,33 @@ Features
 - Chat history saved
 - Source citations for every answer
 
-Tech Stack
+**Tech Stack**
 
-Backend:
-Java 17 - Core programming language
-Spring Boot 3.2 - Application framework
-Groq API - LLM for AI responses
-Spring Security - Authentication
-Maven - Build tool
+**Backend:**
+- Java 17 - Core programming language
+- Spring Boot 3.2 - Application framework
+- Groq API - LLM for AI responses
+- Spring Security - Authentication
+- Maven - Build tool
 
-Frontend:
-HTML5 - Page structure
-CSS3 - Styling and animations
-JavaScript - Interactivity
-Google Fonts - Typography
+**Frontend:**
+- HTML5 - Page structure
+- CSS3 - Styling & animations
+- JavaScript - Interactivity
+- Google Fonts - Typography
 
-Database:
-PostgreSQL / H2 - Data storage
+**Database:**
+- PostgreSQL / H2 - Data storage
 
-Authentication:
-Google OAuth 2.0 - Secure login
+**Authentication:**
+- Google OAuth 2.0 - Secure login
 
-How to Run
-1. Clone: git clone https://github.com/sakshi-harikant/rag-chatbot.git
-2. cd rag-chatbot
-3. mvn clean install
-4. mvn spring-boot:run
-5. Open: http://localhost:8080
+**How to Run**
+1. Clone: `git clone https://github.com/sakshi-harikant/rag-chatbot.git`
+2. `cd rag-chatbot`
+3. `mvn clean install`
+4. `mvn spring-boot:run`
+5. Open: `http://localhost:8080`
 
-Author
-Sakshi Mohan Harikant
-Email: connect.sakshi16@gmail.com
-GitHub: https://github.com/sakshi-harikant
+**License**
+MIT License
